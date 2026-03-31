@@ -102,6 +102,17 @@ ul {
   opacity: 0.4;
 }
 
+.todo-edit {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 1px solid #0f3460;
+  border-radius: 6px;
+  background: #16213e;
+  color: #e0e0e0;
+  font-size: 1rem;
+  outline: none;
+}
+
 .delete-btn {
   background: none;
   border: none;

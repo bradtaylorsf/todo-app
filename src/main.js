@@ -1,8 +1,9 @@
-import { createTodo, toggleTodo, removeTodo, filterTodos, countActive, countCompleted } from './todo.js';
+import { createTodo, toggleTodo, removeTodo, editTodo, filterTodos, countActive, countCompleted } from './todo.js';
 import { loadTodos, saveTodos } from './storage.js';
 
 let todos = loadTodos();
 let currentFilter = 'all';
+let editingId = null;
 
 const app = document.getElementById('app');
 
@@ -56,34 +57,95 @@ function render() {
     li.setAttribute('data-testid', 'todo-item');
     li.setAttribute('data-id', todo.id);
 
-    const checkbox = document.createElement('input');
-    checkbox.type = 'checkbox';
-    checkbox.checked = todo.completed;
-    checkbox.setAttribute('data-testid', 'todo-checkbox');
-    checkbox.addEventListener('change', () => {
-      todos = toggleTodo(todos, todo.id);
-      saveTodos(todos);
-      render();
-    });
+    if (editingId === todo.id) {
+      const editInput = document.createElement('input');
+      editInput.type = 'text';
+      editInput.className = 'todo-edit';
+      editInput.value = todo.text;
+      editInput.setAttribute('data-testid', 'todo-edit');
 
-    const span = document.createElement('span');
-    span.className = 'todo-text';
-    span.textContent = todo.text;
-    span.setAttribute('data-testid', 'todo-text');
+      let handled = false;
 
-    const deleteBtn = document.createElement('button');
-    deleteBtn.className = 'delete-btn';
-    deleteBtn.innerHTML = '&times;';
-    deleteBtn.setAttribute('data-testid', 'todo-delete');
-    deleteBtn.addEventListener('click', () => {
-      todos = removeTodo(todos, todo.id);
-      saveTodos(todos);
-      render();
-    });
+      const saveEdit = () => {
+        if (handled) return;
+        handled = true;
+        const trimmed = editInput.value.trim();
+        if (!trimmed) {
+          todos = removeTodo(todos, todo.id);
+        } else {
+          try {
+            todos = editTodo(todos, todo.id, editInput.value);
+          } catch {
+            // editTodo throws on empty — already handled above
+          }
+        }
+        editingId = null;
+        saveTodos(todos);
+        render();
+      };
 
-    li.appendChild(checkbox);
-    li.appendChild(span);
-    li.appendChild(deleteBtn);
+      const cancelEdit = () => {
+        if (handled) return;
+        handled = true;
+        editingId = null;
+        render();
+      };
+
+      editInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          saveEdit();
+        } else if (e.key === 'Escape') {
+          e.preventDefault();
+          cancelEdit();
+        }
+      });
+
+      editInput.addEventListener('blur', () => {
+        saveEdit();
+      });
+
+      li.appendChild(editInput);
+
+      requestAnimationFrame(() => {
+        editInput.focus();
+        editInput.select();
+      });
+    } else {
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.checked = todo.completed;
+      checkbox.setAttribute('data-testid', 'todo-checkbox');
+      checkbox.addEventListener('change', () => {
+        todos = toggleTodo(todos, todo.id);
+        saveTodos(todos);
+        render();
+      });
+
+      const span = document.createElement('span');
+      span.className = 'todo-text';
+      span.textContent = todo.text;
+      span.setAttribute('data-testid', 'todo-text');
+      span.addEventListener('dblclick', () => {
+        editingId = todo.id;
+        render();
+      });
+
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'delete-btn';
+      deleteBtn.innerHTML = '&times;';
+      deleteBtn.setAttribute('data-testid', 'todo-delete');
+      deleteBtn.addEventListener('click', () => {
+        todos = removeTodo(todos, todo.id);
+        saveTodos(todos);
+        render();
+      });
+
+      li.appendChild(checkbox);
+      li.appendChild(span);
+      li.appendChild(deleteBtn);
+    }
+
     ul.appendChild(li);
   }
 
