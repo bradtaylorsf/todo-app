@@ -251,3 +251,48 @@ ul {
 .clear-completed:hover {
   color: #e74c3c;
 }
+
+.priority-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.priority-high {
+  background: #e74c3c;
+}
+
+.priority-medium {
+  background: #f39c12;
+}
+
+.priority-low {
+  background: #3498db;
+}
+
+.todo-form select {
+  padding: 0.75rem;
+  border: 1px solid #333;
+  border-radius: 6px;
+  background: #16213e;
+  color: #e0e0e0;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.sort-priority {
+  background: none;
+  border: 1px solid transparent;
+  color: #666;
+  font-size: 0.875rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.sort-priority:hover {
+  color: #e0e0e0;
+  border-color: #0f3460;
+}

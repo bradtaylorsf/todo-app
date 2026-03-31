@@ -1,4 +1,4 @@
-import { createTodo, toggleTodo, removeTodo, editTodo, reorderTodos, filterTodos, countActive, countCompleted, isOverdue, isDueToday } from './todo.js';
+import { createTodo, toggleTodo, removeTodo, editTodo, reorderTodos, filterTodos, countActive, countCompleted, isOverdue, isDueToday, sortByPriority } from './todo.js';
 import { loadTodos, saveTodos } from './storage.js';
 
 let todos = loadTodos();
@@ -34,15 +34,26 @@ function render() {
   dateInput.type = 'date';
   dateInput.setAttribute('data-testid', 'due-date-input');
 
+  const prioritySelect = document.createElement('select');
+  prioritySelect.setAttribute('data-testid', 'priority-select');
+  for (const p of ['low', 'medium', 'high']) {
+    const opt = document.createElement('option');
+    opt.value = p;
+    opt.textContent = p.charAt(0).toUpperCase() + p.slice(1);
+    if (p === 'medium') opt.selected = true;
+    prioritySelect.appendChild(opt);
+  }
+
   form.appendChild(input);
   form.appendChild(dateInput);
+  form.appendChild(prioritySelect);
   form.appendChild(addBtn);
   container.appendChild(form);
 
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     try {
-      const todo = createTodo(input.value, dateInput.value || null);
+      const todo = createTodo(input.value, { dueDate: dateInput.value || null, priority: prioritySelect.value });
       todos = [...todos, todo];
       saveTodos(todos);
       render();
@@ -220,6 +231,12 @@ function render() {
         render();
       });
 
+      const priorityDot = document.createElement('span');
+      const todoPriority = todo.priority || 'medium';
+      priorityDot.className = `priority-indicator priority-${todoPriority}`;
+      priorityDot.setAttribute('data-testid', 'priority-indicator');
+
+      li.appendChild(priorityDot);
       li.appendChild(handle);
       li.appendChild(checkbox);
       li.appendChild(span);
@@ -274,6 +291,17 @@ function render() {
   }
 
   footer.appendChild(filterGroup);
+
+  const sortPriorityBtn = document.createElement('button');
+  sortPriorityBtn.textContent = 'Sort by priority';
+  sortPriorityBtn.setAttribute('data-testid', 'sort-priority');
+  sortPriorityBtn.className = 'sort-priority';
+  sortPriorityBtn.addEventListener('click', () => {
+    todos = sortByPriority(todos);
+    saveTodos(todos);
+    render();
+  });
+  footer.appendChild(sortPriorityBtn);
 
   if (countCompleted(todos) > 0) {
     const clearBtn = document.createElement('button');
