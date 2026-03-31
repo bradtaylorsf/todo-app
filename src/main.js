@@ -94,7 +94,8 @@ function render() {
 
   const count = document.createElement('span');
   count.setAttribute('data-testid', 'todo-count');
-  count.textContent = `${countActive(todos)} items left`;
+  const activeCount = countActive(todos);
+  count.textContent = `${activeCount} ${activeCount === 1 ? 'item' : 'items'} left`;
   footer.appendChild(count);
 
   const filterGroup = document.createElement('div');
