@@ -31,6 +31,13 @@ export function editTodo(todos, id, newText) {
   );
 }
 
+export function reorderTodos(todos, fromIndex, toIndex) {
+  const result = [...todos];
+  const [moved] = result.splice(fromIndex, 1);
+  result.splice(toIndex, 0, moved);
+  return result;
+}
+
 export function filterTodos(todos, filter) {
   if (filter === 'active') return todos.filter((t) => !t.completed);
   if (filter === 'completed') return todos.filter((t) => t.completed);

@@ -1,4 +1,4 @@
-import { createTodo, toggleTodo, removeTodo, editTodo, filterTodos, countActive, countCompleted } from './todo.js';
+import { createTodo, toggleTodo, removeTodo, editTodo, reorderTodos, filterTodos, countActive, countCompleted } from './todo.js';
 import { loadTodos, saveTodos } from './storage.js';
 
 let todos = loadTodos();
@@ -48,6 +48,56 @@ function render() {
 
   const ul = document.createElement('ul');
   ul.setAttribute('data-testid', 'todo-list');
+
+  let draggedId = null;
+
+  ul.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    const target = e.target.closest('.todo-item');
+    if (!target || !ul.contains(target)) return;
+    ul.querySelectorAll('.todo-item').forEach(el => {
+      el.classList.remove('drag-over-above', 'drag-over-below');
+    });
+    const rect = target.getBoundingClientRect();
+    const midY = rect.top + rect.height / 2;
+    if (e.clientY < midY) {
+      target.classList.add('drag-over-above');
+    } else {
+      target.classList.add('drag-over-below');
+    }
+  });
+
+  ul.addEventListener('dragleave', (e) => {
+    const target = e.target.closest('.todo-item');
+    if (target) {
+      target.classList.remove('drag-over-above', 'drag-over-below');
+    }
+  });
+
+  ul.addEventListener('drop', (e) => {
+    e.preventDefault();
+    ul.querySelectorAll('.todo-item').forEach(el => {
+      el.classList.remove('drag-over-above', 'drag-over-below');
+    });
+    const target = e.target.closest('.todo-item');
+    if (!target || !draggedId) return;
+    const targetId = target.getAttribute('data-id');
+    if (draggedId === targetId) return;
+    const fromIndex = todos.findIndex(t => t.id === draggedId);
+    let toIndex = todos.findIndex(t => t.id === targetId);
+    if (fromIndex === -1 || toIndex === -1) return;
+    const rect = target.getBoundingClientRect();
+    const midY = rect.top + rect.height / 2;
+    if (e.clientY >= midY && toIndex < fromIndex) {
+      toIndex++;
+    } else if (e.clientY < midY && toIndex > fromIndex) {
+      toIndex--;
+    }
+    todos = reorderTodos(todos, fromIndex, toIndex);
+    saveTodos(todos);
+    render();
+  });
 
   const visibleTodos = filterTodos(todos, currentFilter);
 
@@ -112,6 +162,25 @@ function render() {
         editInput.select();
       });
     } else {
+      li.draggable = true;
+
+      li.addEventListener('dragstart', (e) => {
+        draggedId = todo.id;
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', todo.id);
+        li.classList.add('dragging');
+      });
+
+      li.addEventListener('dragend', () => {
+        li.classList.remove('dragging');
+        draggedId = null;
+      });
+
+      const handle = document.createElement('span');
+      handle.className = 'drag-handle';
+      handle.textContent = '\u2801\u2801\u2801';
+      handle.setAttribute('data-testid', 'drag-handle');
+
       const checkbox = document.createElement('input');
       checkbox.type = 'checkbox';
       checkbox.checked = todo.completed;
@@ -141,6 +210,7 @@ function render() {
         render();
       });
 
+      li.appendChild(handle);
       li.appendChild(checkbox);
       li.appendChild(span);
       li.appendChild(deleteBtn);
