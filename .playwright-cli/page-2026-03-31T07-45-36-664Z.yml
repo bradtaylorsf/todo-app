@@ -1,0 +1,17 @@
+- generic [ref=e120]:
+  - heading "Todo App" [level=1] [ref=e121]
+  - generic [ref=e122]:
+    - textbox "What needs to be done?" [ref=e123]
+    - button "Add" [ref=e124] [cursor=pointer]
+  - list [ref=e125]:
+    - listitem [ref=e126]:
+      - checkbox [checked] [ref=e127] [cursor=pointer]
+      - generic [ref=e128]: Buy groceries
+      - button "×" [ref=e129] [cursor=pointer]
+  - generic [ref=e130]:
+    - generic [ref=e131]: 2 items left
+    - generic [ref=e132]:
+      - button "All" [ref=e133] [cursor=pointer]
+      - button "Active" [ref=e134] [cursor=pointer]
+      - button "Completed" [ref=e135] [cursor=pointer]
+    - button "Clear completed" [ref=e136] [cursor=pointer]
