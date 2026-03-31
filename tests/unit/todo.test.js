@@ -8,6 +8,9 @@ import {
   filterTodos,
   countActive,
   countCompleted,
+  isOverdue,
+  isDueToday,
+  sortByDueDate,
 } from '../../src/todo.js';
 
 function makeTodo(overrides = {}) {
@@ -16,8 +19,22 @@ function makeTodo(overrides = {}) {
     text: 'Test todo',
     completed: false,
     createdAt: 1000,
+    dueDate: null,
     ...overrides,
   };
+}
+
+function todayString() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function pastDateString() {
+  return '2020-01-01';
+}
+
+function futureDateString() {
+  return '2099-12-31';
 }
 
 describe('createTodo', () => {
@@ -261,5 +278,110 @@ describe('countCompleted', () => {
 
   it('returns 0 when none completed', () => {
     expect(countCompleted([makeTodo({ completed: false })])).toBe(0);
+  });
+});
+
+describe('createTodo with dueDate', () => {
+  it('creates todo with dueDate when provided', () => {
+    const todo = createTodo('Test', '2026-04-15');
+    expect(todo.dueDate).toBe('2026-04-15');
+  });
+
+  it('creates todo with null dueDate by default', () => {
+    const todo = createTodo('Test');
+    expect(todo.dueDate).toBeNull();
+  });
+});
+
+describe('isOverdue', () => {
+  it('returns true for past date, incomplete todo', () => {
+    expect(isOverdue(makeTodo({ dueDate: pastDateString() }))).toBe(true);
+  });
+
+  it('returns false for future date', () => {
+    expect(isOverdue(makeTodo({ dueDate: futureDateString() }))).toBe(false);
+  });
+
+  it('returns false for today', () => {
+    expect(isOverdue(makeTodo({ dueDate: todayString() }))).toBe(false);
+  });
+
+  it('returns false for completed todo even with past date', () => {
+    expect(isOverdue(makeTodo({ dueDate: pastDateString(), completed: true }))).toBe(false);
+  });
+
+  it('returns false when dueDate is null', () => {
+    expect(isOverdue(makeTodo())).toBe(false);
+  });
+});
+
+describe('isDueToday', () => {
+  it('returns true when dueDate is today', () => {
+    expect(isDueToday(makeTodo({ dueDate: todayString() }))).toBe(true);
+  });
+
+  it('returns false for past date', () => {
+    expect(isDueToday(makeTodo({ dueDate: pastDateString() }))).toBe(false);
+  });
+
+  it('returns false for future date', () => {
+    expect(isDueToday(makeTodo({ dueDate: futureDateString() }))).toBe(false);
+  });
+
+  it('returns false for completed todo due today', () => {
+    expect(isDueToday(makeTodo({ dueDate: todayString(), completed: true }))).toBe(false);
+  });
+
+  it('returns false when dueDate is null', () => {
+    expect(isDueToday(makeTodo())).toBe(false);
+  });
+});
+
+describe('sortByDueDate', () => {
+  it('sorts earliest due date first', () => {
+    const todos = [
+      makeTodo({ id: '1', dueDate: '2026-06-01' }),
+      makeTodo({ id: '2', dueDate: '2026-01-01' }),
+      makeTodo({ id: '3', dueDate: '2026-03-15' }),
+    ];
+    const result = sortByDueDate(todos);
+    expect(result.map(t => t.id)).toEqual(['2', '3', '1']);
+  });
+
+  it('puts null-dueDate todos last', () => {
+    const todos = [
+      makeTodo({ id: '1', dueDate: null }),
+      makeTodo({ id: '2', dueDate: '2026-01-01' }),
+    ];
+    const result = sortByDueDate(todos);
+    expect(result.map(t => t.id)).toEqual(['2', '1']);
+  });
+
+  it('preserves order for same dates', () => {
+    const todos = [
+      makeTodo({ id: '1', dueDate: '2026-01-01' }),
+      makeTodo({ id: '2', dueDate: '2026-01-01' }),
+    ];
+    const result = sortByDueDate(todos);
+    expect(result.map(t => t.id)).toEqual(['1', '2']);
+  });
+
+  it('handles all-null dueDates', () => {
+    const todos = [
+      makeTodo({ id: '1' }),
+      makeTodo({ id: '2' }),
+    ];
+    const result = sortByDueDate(todos);
+    expect(result.map(t => t.id)).toEqual(['1', '2']);
+  });
+
+  it('does not mutate input', () => {
+    const todos = Object.freeze([
+      makeTodo({ id: '1', dueDate: '2026-06-01' }),
+      makeTodo({ id: '2', dueDate: '2026-01-01' }),
+    ]);
+    const result = sortByDueDate(todos);
+    expect(result).not.toBe(todos);
+    expect(todos[0].id).toBe('1');
   });
 });

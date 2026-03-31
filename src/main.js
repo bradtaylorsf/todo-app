@@ -1,4 +1,4 @@
-import { createTodo, toggleTodo, removeTodo, editTodo, reorderTodos, filterTodos, countActive, countCompleted } from './todo.js';
+import { createTodo, toggleTodo, removeTodo, editTodo, reorderTodos, filterTodos, countActive, countCompleted, isOverdue, isDueToday } from './todo.js';
 import { loadTodos, saveTodos } from './storage.js';
 
 let todos = loadTodos();
@@ -30,14 +30,19 @@ function render() {
   addBtn.textContent = 'Add';
   addBtn.setAttribute('data-testid', 'add-button');
 
+  const dateInput = document.createElement('input');
+  dateInput.type = 'date';
+  dateInput.setAttribute('data-testid', 'due-date-input');
+
   form.appendChild(input);
+  form.appendChild(dateInput);
   form.appendChild(addBtn);
   container.appendChild(form);
 
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     try {
-      const todo = createTodo(input.value);
+      const todo = createTodo(input.value, dateInput.value || null);
       todos = [...todos, todo];
       saveTodos(todos);
       render();
@@ -103,9 +108,14 @@ function render() {
 
   for (const todo of visibleTodos) {
     const li = document.createElement('li');
-    li.className = 'todo-item' + (todo.completed ? ' completed' : '');
+    let className = 'todo-item';
+    if (todo.completed) className += ' completed';
+    if (isOverdue(todo)) className += ' overdue';
+    if (isDueToday(todo)) className += ' due-today';
+    li.className = className;
     li.setAttribute('data-testid', 'todo-item');
     li.setAttribute('data-id', todo.id);
+    if (isOverdue(todo)) li.setAttribute('data-overdue', '');
 
     if (editingId === todo.id) {
       const editInput = document.createElement('input');
@@ -213,6 +223,24 @@ function render() {
       li.appendChild(handle);
       li.appendChild(checkbox);
       li.appendChild(span);
+
+      if (todo.dueDate) {
+        const dueDateSpan = document.createElement('span');
+        dueDateSpan.className = 'todo-due-date';
+        dueDateSpan.setAttribute('data-testid', 'todo-due-date');
+        if (isDueToday(todo)) {
+          dueDateSpan.textContent = 'Today';
+        } else {
+          const date = new Date(todo.dueDate + 'T00:00:00');
+          dueDateSpan.textContent = date.toLocaleDateString('en-US', {
+            weekday: 'short',
+            month: 'short',
+            day: 'numeric',
+          });
+        }
+        li.appendChild(dueDateSpan);
+      }
+
       li.appendChild(deleteBtn);
     }
 
