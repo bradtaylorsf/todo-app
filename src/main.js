@@ -1,7 +1,8 @@
-import { createTodo, toggleTodo, removeTodo, countActive } from './todo.js';
+import { createTodo, toggleTodo, removeTodo, filterTodos, countActive, countCompleted } from './todo.js';
 import { loadTodos, saveTodos } from './storage.js';
 
 let todos = loadTodos();
+let currentFilter = 'all';
 
 const app = document.getElementById('app');
 
@@ -47,7 +48,9 @@ function render() {
   const ul = document.createElement('ul');
   ul.setAttribute('data-testid', 'todo-list');
 
-  for (const todo of todos) {
+  const visibleTodos = filterTodos(todos, currentFilter);
+
+  for (const todo of visibleTodos) {
     const li = document.createElement('li');
     li.className = 'todo-item' + (todo.completed ? ' completed' : '');
     li.setAttribute('data-testid', 'todo-item');
@@ -86,10 +89,46 @@ function render() {
 
   container.appendChild(ul);
 
-  const count = document.createElement('p');
+  const footer = document.createElement('div');
+  footer.className = 'todo-footer';
+
+  const count = document.createElement('span');
   count.setAttribute('data-testid', 'todo-count');
-  count.textContent = `${countActive(todos)} items left`;
-  container.appendChild(count);
+  const activeCount = countActive(todos);
+  count.textContent = `${activeCount} ${activeCount === 1 ? 'item' : 'items'} left`;
+  footer.appendChild(count);
+
+  const filterGroup = document.createElement('div');
+  filterGroup.className = 'filter-buttons';
+
+  for (const filter of ['all', 'active', 'completed']) {
+    const btn = document.createElement('button');
+    btn.textContent = filter.charAt(0).toUpperCase() + filter.slice(1);
+    btn.setAttribute('data-testid', `filter-${filter}`);
+    if (filter === currentFilter) btn.classList.add('active');
+    btn.addEventListener('click', () => {
+      currentFilter = filter;
+      render();
+    });
+    filterGroup.appendChild(btn);
+  }
+
+  footer.appendChild(filterGroup);
+
+  if (countCompleted(todos) > 0) {
+    const clearBtn = document.createElement('button');
+    clearBtn.textContent = 'Clear completed';
+    clearBtn.setAttribute('data-testid', 'clear-completed');
+    clearBtn.className = 'clear-completed';
+    clearBtn.addEventListener('click', () => {
+      todos = todos.filter(t => !t.completed);
+      saveTodos(todos);
+      render();
+    });
+    footer.appendChild(clearBtn);
+  }
+
+  container.appendChild(footer);
 
   app.appendChild(container);
 }
