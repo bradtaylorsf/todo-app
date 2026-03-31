@@ -1,7 +1,0 @@
-- generic [ref=e2]:
-  - heading "Todo App" [level=1] [ref=e3]
-  - generic [ref=e4]:
-    - textbox "What needs to be done?" [active] [ref=e5]
-    - button "Add" [ref=e6] [cursor=pointer]
-  - list
-  - paragraph [ref=e7]: 0 items left
