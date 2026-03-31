@@ -1,2 +1,0 @@
-[     325ms] [ERROR] Failed to fetch pending ideas: SyntaxError: Unexpected token '<', "<!DOCTYPE "... is not valid JSON @ http://localhost:3000/src/client/hooks/useBoardItems.ts:36
-[     331ms] [ERROR] Failed to fetch pending ideas: SyntaxError: Unexpected token '<', "<!DOCTYPE "... is not valid JSON @ http://localhost:3000/src/client/hooks/useBoardItems.ts:36
