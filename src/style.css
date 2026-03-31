@@ -296,3 +296,123 @@ ul {
   color: #e0e0e0;
   border-color: #0f3460;
 }
+
+/* Focus styles for keyboard navigation */
+:focus-visible {
+  outline: 2px solid #0f3460;
+  outline-offset: 2px;
+}
+
+.delete-btn:focus-visible {
+  opacity: 1;
+}
+
+/* Screen reader only */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+/* Shortcuts trigger button */
+.shortcuts-trigger {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid #333;
+  background: #16213e;
+  color: #888;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s, border-color 0.15s;
+  z-index: 100;
+}
+
+.shortcuts-trigger:hover {
+  color: #e0e0e0;
+  border-color: #0f3460;
+}
+
+/* Shortcuts overlay */
+.shortcuts-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+
+.shortcuts-overlay.hidden {
+  display: none;
+}
+
+.shortcuts-content {
+  background: #16213e;
+  border: 1px solid #333;
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 360px;
+  width: 90%;
+}
+
+.shortcuts-content h2 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 1rem;
+}
+
+.shortcuts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.shortcuts-list > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.shortcuts-list dt {
+  background: #1a1a2e;
+  border: 1px solid #333;
+  border-radius: 4px;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.8rem;
+  color: #e0e0e0;
+  font-family: monospace;
+}
+
+.shortcuts-list dd {
+  color: #888;
+  font-size: 0.875rem;
+}
+
+.shortcuts-dismiss {
+  margin-top: 1rem;
+  text-align: center;
+  color: #555;
+  font-size: 0.75rem;
+}
+
+.shortcuts-dismiss kbd {
+  background: #1a1a2e;
+  border: 1px solid #333;
+  border-radius: 3px;
+  padding: 0.1rem 0.35rem;
+  font-size: 0.7rem;
+}
