@@ -4,6 +4,7 @@ import {
   toggleTodo,
   removeTodo,
   editTodo,
+  reorderTodos,
   filterTodos,
   countActive,
   countCompleted,
@@ -137,6 +138,57 @@ describe('editTodo', () => {
     const todos = [makeTodo(), makeTodo({ id: 'test-2' })];
     const result = editTodo(todos, 'test-1', 'Updated');
     expect(result[1]).toBe(todos[1]);
+  });
+});
+
+describe('reorderTodos', () => {
+  it('moves item from first to last position', () => {
+    const todos = [
+      makeTodo({ id: '1', text: 'A' }),
+      makeTodo({ id: '2', text: 'B' }),
+      makeTodo({ id: '3', text: 'C' }),
+    ];
+    const result = reorderTodos(todos, 0, 2);
+    expect(result.map(t => t.id)).toEqual(['2', '3', '1']);
+  });
+
+  it('moves item from last to first position', () => {
+    const todos = [
+      makeTodo({ id: '1', text: 'A' }),
+      makeTodo({ id: '2', text: 'B' }),
+      makeTodo({ id: '3', text: 'C' }),
+    ];
+    const result = reorderTodos(todos, 2, 0);
+    expect(result.map(t => t.id)).toEqual(['3', '1', '2']);
+  });
+
+  it('does not mutate the original array', () => {
+    const todos = Object.freeze([
+      makeTodo({ id: '1' }),
+      makeTodo({ id: '2' }),
+      makeTodo({ id: '3' }),
+    ]);
+    const result = reorderTodos(todos, 0, 2);
+    expect(result).not.toBe(todos);
+    expect(todos.map(t => t.id)).toEqual(['1', '2', '3']);
+  });
+
+  it('handles same index (no-op)', () => {
+    const todos = [
+      makeTodo({ id: '1' }),
+      makeTodo({ id: '2' }),
+    ];
+    const result = reorderTodos(todos, 1, 1);
+    expect(result.map(t => t.id)).toEqual(['1', '2']);
+  });
+
+  it('handles adjacent swap', () => {
+    const todos = [
+      makeTodo({ id: '1', text: 'A' }),
+      makeTodo({ id: '2', text: 'B' }),
+    ];
+    const result = reorderTodos(todos, 0, 1);
+    expect(result.map(t => t.id)).toEqual(['2', '1']);
   });
 });
 
