@@ -1,4 +1,4 @@
-export function createTodo(text) {
+export function createTodo(text, dueDate = null) {
   const trimmed = text.trim();
   if (!trimmed) {
     throw new Error('Todo text cannot be empty');
@@ -8,7 +8,34 @@ export function createTodo(text) {
     text: trimmed,
     completed: false,
     createdAt: Date.now(),
+    dueDate: dueDate || null,
   };
+}
+
+export function isOverdue(todo) {
+  if (!todo.dueDate || todo.completed) return false;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const due = new Date(todo.dueDate + 'T00:00:00');
+  return due < today;
+}
+
+export function isDueToday(todo) {
+  if (!todo.dueDate || todo.completed) return false;
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const dd = String(today.getDate()).padStart(2, '0');
+  return todo.dueDate === `${yyyy}-${mm}-${dd}`;
+}
+
+export function sortByDueDate(todos) {
+  return [...todos].sort((a, b) => {
+    if (!a.dueDate && !b.dueDate) return 0;
+    if (!a.dueDate) return 1;
+    if (!b.dueDate) return -1;
+    return a.dueDate.localeCompare(b.dueDate);
+  });
 }
 
 export function toggleTodo(todos, id) {
