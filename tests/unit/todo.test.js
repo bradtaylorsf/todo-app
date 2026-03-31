@@ -13,6 +13,7 @@ import {
   sortByDueDate,
   setPriority,
   sortByPriority,
+  toggleAllTodos,
 } from '../../src/todo.js';
 
 function makeTodo(overrides = {}) {
@@ -465,5 +466,38 @@ describe('sortByDueDate', () => {
     const result = sortByDueDate(todos);
     expect(result).not.toBe(todos);
     expect(todos[0].id).toBe('1');
+  });
+});
+
+describe('toggleAllTodos', () => {
+  it('marks all as completed when some are active', () => {
+    const todos = [
+      makeTodo({ id: '1', completed: false }),
+      makeTodo({ id: '2', completed: true }),
+      makeTodo({ id: '3', completed: false }),
+    ];
+    const result = toggleAllTodos(todos);
+    expect(result.every(t => t.completed)).toBe(true);
+  });
+
+  it('marks all as active when all are completed', () => {
+    const todos = [
+      makeTodo({ id: '1', completed: true }),
+      makeTodo({ id: '2', completed: true }),
+    ];
+    const result = toggleAllTodos(todos);
+    expect(result.every(t => !t.completed)).toBe(true);
+  });
+
+  it('returns empty array unchanged', () => {
+    const result = toggleAllTodos([]);
+    expect(result).toEqual([]);
+  });
+
+  it('does not mutate the original array', () => {
+    const todos = [makeTodo({ id: '1', completed: false })];
+    const result = toggleAllTodos(todos);
+    expect(result).not.toBe(todos);
+    expect(todos[0].completed).toBe(false);
   });
 });

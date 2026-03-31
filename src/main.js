@@ -1,4 +1,4 @@
-import { createTodo, toggleTodo, removeTodo, editTodo, reorderTodos, filterTodos, countActive, countCompleted, isOverdue, isDueToday, sortByPriority } from './todo.js';
+import { createTodo, toggleTodo, removeTodo, editTodo, reorderTodos, filterTodos, countActive, countCompleted, isOverdue, isDueToday, sortByPriority, toggleAllTodos } from './todo.js';
 import { loadTodos, saveTodos } from './storage.js';
 
 let todos = loadTodos();
@@ -6,6 +6,108 @@ let currentFilter = 'all';
 let editingId = null;
 
 const app = document.getElementById('app');
+
+// Live region for screen reader announcements
+const liveRegion = document.createElement('div');
+liveRegion.setAttribute('aria-live', 'polite');
+liveRegion.setAttribute('id', 'live-region');
+liveRegion.className = 'sr-only';
+document.body.appendChild(liveRegion);
+
+function announce(message) {
+  liveRegion.textContent = message;
+}
+
+// Shortcuts help overlay
+const shortcutsOverlay = document.createElement('div');
+shortcutsOverlay.className = 'shortcuts-overlay hidden';
+shortcutsOverlay.setAttribute('data-testid', 'shortcuts-help');
+shortcutsOverlay.innerHTML = `
+  <div class="shortcuts-content">
+    <h2>Keyboard Shortcuts</h2>
+    <dl class="shortcuts-list">
+      <div><dt>/</dt><dd>Focus input</dd></div>
+      <div><dt>1</dt><dd>Show All</dd></div>
+      <div><dt>2</dt><dd>Show Active</dd></div>
+      <div><dt>3</dt><dd>Show Completed</dd></div>
+      <div><dt>Ctrl/⌘+A</dt><dd>Toggle all todos</dd></div>
+      <div><dt>?</dt><dd>Toggle this help</dd></div>
+    </dl>
+    <p class="shortcuts-dismiss">Press <kbd>Esc</kbd> or <kbd>?</kbd> to close</p>
+  </div>
+`;
+document.body.appendChild(shortcutsOverlay);
+
+shortcutsOverlay.addEventListener('click', (e) => {
+  if (e.target === shortcutsOverlay) {
+    shortcutsOverlay.classList.add('hidden');
+  }
+});
+
+// Shortcuts trigger button
+const shortcutsTrigger = document.createElement('button');
+shortcutsTrigger.className = 'shortcuts-trigger';
+shortcutsTrigger.setAttribute('data-testid', 'shortcuts-trigger');
+shortcutsTrigger.setAttribute('aria-label', 'Show keyboard shortcuts');
+shortcutsTrigger.textContent = '?';
+shortcutsTrigger.addEventListener('click', () => {
+  shortcutsOverlay.classList.toggle('hidden');
+});
+document.body.appendChild(shortcutsTrigger);
+
+// Global keyboard shortcuts
+document.addEventListener('keydown', (e) => {
+  const tag = document.activeElement?.tagName;
+  const inputFocused = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
+  const overlayVisible = !shortcutsOverlay.classList.contains('hidden');
+
+  if (e.key === 'Escape' && overlayVisible) {
+    shortcutsOverlay.classList.add('hidden');
+    return;
+  }
+
+  if (e.key === '?' && !inputFocused) {
+    shortcutsOverlay.classList.toggle('hidden');
+    return;
+  }
+
+  // Disable other shortcuts while overlay is visible
+  if (overlayVisible) return;
+
+  if (e.key === '/') {
+    e.preventDefault();
+    const todoInput = document.querySelector('[data-testid="todo-input"]');
+    if (todoInput) todoInput.focus();
+    return;
+  }
+
+  if (!inputFocused) {
+    if (e.key === '1') {
+      currentFilter = 'all';
+      render();
+      return;
+    }
+    if (e.key === '2') {
+      currentFilter = 'active';
+      render();
+      return;
+    }
+    if (e.key === '3') {
+      currentFilter = 'completed';
+      render();
+      return;
+    }
+    if ((e.ctrlKey || e.metaKey) && e.key === 'a') {
+      e.preventDefault();
+      todos = toggleAllTodos(todos);
+      saveTodos(todos);
+      render();
+      const allCompleted = todos.every(t => t.completed);
+      announce(allCompleted ? 'All todos completed' : 'All todos marked active');
+      return;
+    }
+  }
+});
 
 function render() {
   app.innerHTML = '';
@@ -57,6 +159,7 @@ function render() {
       todos = [...todos, todo];
       saveTodos(todos);
       render();
+      announce('Todo added');
     } catch {
       // Empty input — ignore
     }
@@ -64,6 +167,7 @@ function render() {
 
   const ul = document.createElement('ul');
   ul.setAttribute('data-testid', 'todo-list');
+  ul.setAttribute('role', 'list');
 
   let draggedId = null;
 
@@ -126,6 +230,7 @@ function render() {
     li.className = className;
     li.setAttribute('data-testid', 'todo-item');
     li.setAttribute('data-id', todo.id);
+    li.setAttribute('role', 'listitem');
     if (isOverdue(todo)) li.setAttribute('data-overdue', '');
 
     if (editingId === todo.id) {
@@ -206,10 +311,13 @@ function render() {
       checkbox.type = 'checkbox';
       checkbox.checked = todo.completed;
       checkbox.setAttribute('data-testid', 'todo-checkbox');
+      checkbox.setAttribute('aria-label', `Mark ${todo.text} as ${todo.completed ? 'incomplete' : 'complete'}`);
       checkbox.addEventListener('change', () => {
         todos = toggleTodo(todos, todo.id);
         saveTodos(todos);
         render();
+        const toggled = todos.find(t => t.id === todo.id);
+        announce(toggled?.completed ? 'Todo completed' : 'Todo marked active');
       });
 
       const span = document.createElement('span');
@@ -225,10 +333,12 @@ function render() {
       deleteBtn.className = 'delete-btn';
       deleteBtn.innerHTML = '&times;';
       deleteBtn.setAttribute('data-testid', 'todo-delete');
+      deleteBtn.setAttribute('aria-label', `Delete ${todo.text}`);
       deleteBtn.addEventListener('click', () => {
         todos = removeTodo(todos, todo.id);
         saveTodos(todos);
         render();
+        announce('Todo deleted');
       });
 
       const priorityDot = document.createElement('span');
@@ -282,6 +392,7 @@ function render() {
     const btn = document.createElement('button');
     btn.textContent = filter.charAt(0).toUpperCase() + filter.slice(1);
     btn.setAttribute('data-testid', `filter-${filter}`);
+    btn.setAttribute('aria-pressed', String(filter === currentFilter));
     if (filter === currentFilter) btn.classList.add('active');
     btn.addEventListener('click', () => {
       currentFilter = filter;
@@ -312,6 +423,7 @@ function render() {
       todos = todos.filter(t => !t.completed);
       saveTodos(todos);
       render();
+      announce('Completed todos cleared');
     });
     footer.appendChild(clearBtn);
   }

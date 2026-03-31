@@ -93,3 +93,9 @@ export function countActive(todos) {
 export function countCompleted(todos) {
   return todos.filter((t) => t.completed).length;
 }
+
+export function toggleAllTodos(todos) {
+  if (todos.length === 0) return todos;
+  const allCompleted = todos.every(t => t.completed);
+  return todos.map(t => ({ ...t, completed: !allCompleted }));
+}
