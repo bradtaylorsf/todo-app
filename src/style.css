@@ -1,0 +1,129 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #1a1a2e;
+  color: #e0e0e0;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+h1 {
+  font-size: 2rem;
+  font-weight: 300;
+  margin-bottom: 1.5rem;
+  color: #fff;
+}
+
+.todo-form {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.todo-form input[type="text"] {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 1px solid #333;
+  border-radius: 6px;
+  background: #16213e;
+  color: #e0e0e0;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.todo-form input[type="text"]::placeholder {
+  color: #666;
+}
+
+.todo-form input[type="text"]:focus {
+  border-color: #0f3460;
+}
+
+.todo-form button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  background: #0f3460;
+  color: #e0e0e0;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.todo-form button:hover {
+  background: #1a4a8a;
+}
+
+ul {
+  list-style: none;
+}
+
+.todo-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0.5rem;
+  border-bottom: 1px solid #222;
+  transition: background 0.15s;
+}
+
+.todo-item:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.todo-item input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #0f3460;
+  flex-shrink: 0;
+}
+
+.todo-text {
+  flex: 1;
+  font-size: 1rem;
+  word-break: break-word;
+  transition: opacity 0.2s;
+}
+
+.todo-item.completed .todo-text {
+  text-decoration: line-through;
+  opacity: 0.4;
+}
+
+.delete-btn {
+  background: none;
+  border: none;
+  color: #666;
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity 0.15s, color 0.15s;
+}
+
+.todo-item:hover .delete-btn {
+  opacity: 1;
+}
+
+.delete-btn:hover {
+  color: #e74c3c;
+}
+
+[data-testid="todo-count"] {
+  margin-top: 1rem;
+  font-size: 0.875rem;
+  color: #666;
+}
