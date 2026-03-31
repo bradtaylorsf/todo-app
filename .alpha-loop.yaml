@@ -1,0 +1,11 @@
+# Alpha Loop configuration
+repo: bradtaylorsf/todo-app
+model: opus
+review_model: opus
+max_turns: 30
+label: ready
+base_branch: main
+test_command: npm test
+dev_command: npm run dev
+port: 3000
+poll_interval: 60
