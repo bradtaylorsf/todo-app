@@ -6,8 +6,8 @@ export default defineConfig({
     baseURL: 'http://localhost:4173',
   },
   webServer: {
-    command: 'npm run preview -- --port 4173',
+    command: 'npm run build && npm run preview',
     port: 4173,
-    reuseExistingServer: true,
+    reuseExistingServer: false,
   },
 });
