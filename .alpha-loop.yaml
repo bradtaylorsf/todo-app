@@ -1,5 +1,6 @@
 # Alpha Loop configuration
 repo: bradtaylorsf/todo-app
+project: 4
 model: opus
 review_model: opus
 max_turns: 30
