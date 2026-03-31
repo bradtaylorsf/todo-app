@@ -1,3 +1,38 @@
+/* Theme variables */
+:root, [data-theme="dark"] {
+  --bg-primary: #1a1a2e;
+  --bg-secondary: #16213e;
+  --text-primary: #e0e0e0;
+  --text-heading: #fff;
+  --text-muted: #888;
+  --text-dimmed: #666;
+  --text-subtle: #555;
+  --border-color: #333;
+  --border-separator: #222;
+  --accent: #0f3460;
+  --accent-hover: #1a4a8a;
+  --hover-overlay: rgba(255, 255, 255, 0.03);
+  --overlay-bg: rgba(0, 0, 0, 0.6);
+  --delete-hover: #e74c3c;
+}
+
+[data-theme="light"] {
+  --bg-primary: #f5f5f5;
+  --bg-secondary: #ffffff;
+  --text-primary: #333;
+  --text-heading: #111;
+  --text-muted: #666;
+  --text-dimmed: #888;
+  --text-subtle: #aaa;
+  --border-color: #ddd;
+  --border-separator: #eee;
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+  --hover-overlay: rgba(0, 0, 0, 0.03);
+  --overlay-bg: rgba(0, 0, 0, 0.4);
+  --delete-hover: #dc2626;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -6,9 +41,10 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: #1a1a2e;
-  color: #e0e0e0;
+  background: var(--bg-primary);
+  color: var(--text-primary);
   min-height: 100vh;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .container {
@@ -21,7 +57,7 @@ h1 {
   font-size: 2rem;
   font-weight: 300;
   margin-bottom: 1.5rem;
-  color: #fff;
+  color: var(--text-heading);
 }
 
 .todo-form {
@@ -33,36 +69,36 @@ h1 {
 .todo-form input[type="text"] {
   flex: 1;
   padding: 0.75rem 1rem;
-  border: 1px solid #333;
+  border: 1px solid var(--border-color);
   border-radius: 6px;
-  background: #16213e;
-  color: #e0e0e0;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
   font-size: 1rem;
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, background-color 0.3s ease, color 0.3s ease;
 }
 
 .todo-form input[type="text"]::placeholder {
-  color: #666;
+  color: var(--text-dimmed);
 }
 
 .todo-form input[type="text"]:focus {
-  border-color: #0f3460;
+  border-color: var(--accent);
 }
 
 .todo-form button {
   padding: 0.75rem 1.5rem;
   border: none;
   border-radius: 6px;
-  background: #0f3460;
-  color: #e0e0e0;
+  background: var(--accent);
+  color: var(--text-primary);
   font-size: 1rem;
   cursor: pointer;
   transition: background 0.2s;
 }
 
 .todo-form button:hover {
-  background: #1a4a8a;
+  background: var(--accent-hover);
 }
 
 ul {
@@ -74,19 +110,19 @@ ul {
   align-items: center;
   gap: 0.75rem;
   padding: 0.75rem 0.5rem;
-  border-bottom: 1px solid #222;
+  border-bottom: 1px solid var(--border-separator);
   transition: background 0.15s;
 }
 
 .todo-item:hover {
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--hover-overlay);
 }
 
 .todo-item input[type="checkbox"] {
   width: 18px;
   height: 18px;
   cursor: pointer;
-  accent-color: #0f3460;
+  accent-color: var(--accent);
   flex-shrink: 0;
 }
 
@@ -104,7 +140,7 @@ ul {
 
 .todo-due-date {
   font-size: 0.75rem;
-  color: #888;
+  color: var(--text-muted);
   flex-shrink: 0;
 }
 
@@ -134,27 +170,29 @@ ul {
 
 .todo-form input[type="date"] {
   padding: 0.75rem;
-  border: 1px solid #333;
+  border: 1px solid var(--border-color);
   border-radius: 6px;
-  background: #16213e;
-  color: #e0e0e0;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
   font-size: 0.875rem;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .todo-edit {
   flex: 1;
   padding: 0.75rem 1rem;
-  border: 1px solid #0f3460;
+  border: 1px solid var(--accent);
   border-radius: 6px;
-  background: #16213e;
-  color: #e0e0e0;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
   font-size: 1rem;
   outline: none;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .drag-handle {
   cursor: grab;
-  color: #555;
+  color: var(--text-subtle);
   font-size: 1rem;
   user-select: none;
   padding: 0 0.25rem;
@@ -170,17 +208,17 @@ ul {
 }
 
 .todo-item.drag-over-above {
-  border-top: 2px solid #0f3460;
+  border-top: 2px solid var(--accent);
 }
 
 .todo-item.drag-over-below {
-  border-bottom: 2px solid #0f3460;
+  border-bottom: 2px solid var(--accent);
 }
 
 .delete-btn {
   background: none;
   border: none;
-  color: #666;
+  color: var(--text-dimmed);
   font-size: 1.25rem;
   cursor: pointer;
   padding: 0.25rem 0.5rem;
@@ -194,7 +232,7 @@ ul {
 }
 
 .delete-btn:hover {
-  color: #e74c3c;
+  color: var(--delete-hover);
 }
 
 .todo-footer {
@@ -204,8 +242,8 @@ ul {
   margin-top: 1rem;
   padding: 0.75rem 0.5rem;
   font-size: 0.875rem;
-  color: #666;
-  border-top: 1px solid #222;
+  color: var(--text-dimmed);
+  border-top: 1px solid var(--border-separator);
 }
 
 [data-testid="todo-count"] {
@@ -220,7 +258,7 @@ ul {
 .filter-buttons button {
   background: none;
   border: 1px solid transparent;
-  color: #666;
+  color: var(--text-dimmed);
   font-size: 0.875rem;
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
@@ -229,19 +267,19 @@ ul {
 }
 
 .filter-buttons button:hover {
-  color: #e0e0e0;
+  color: var(--text-primary);
 }
 
 .filter-buttons button.active {
-  color: #e0e0e0;
+  color: var(--text-primary);
   font-weight: 600;
-  border-color: #0f3460;
+  border-color: var(--accent);
 }
 
 .clear-completed {
   background: none;
   border: none;
-  color: #666;
+  color: var(--text-dimmed);
   font-size: 0.875rem;
   cursor: pointer;
   padding: 0.25rem 0.5rem;
@@ -249,7 +287,7 @@ ul {
 }
 
 .clear-completed:hover {
-  color: #e74c3c;
+  color: var(--delete-hover);
 }
 
 .priority-indicator {
@@ -273,18 +311,19 @@ ul {
 
 .todo-form select {
   padding: 0.75rem;
-  border: 1px solid #333;
+  border: 1px solid var(--border-color);
   border-radius: 6px;
-  background: #16213e;
-  color: #e0e0e0;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
   font-size: 0.875rem;
   cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .sort-priority {
   background: none;
   border: 1px solid transparent;
-  color: #666;
+  color: var(--text-dimmed);
   font-size: 0.875rem;
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
@@ -293,13 +332,13 @@ ul {
 }
 
 .sort-priority:hover {
-  color: #e0e0e0;
-  border-color: #0f3460;
+  color: var(--text-primary);
+  border-color: var(--accent);
 }
 
 /* Focus styles for keyboard navigation */
 :focus-visible {
-  outline: 2px solid #0f3460;
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
@@ -319,6 +358,31 @@ ul {
   border: 0;
 }
 
+/* Theme toggle button */
+.theme-toggle {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  color: var(--text-muted);
+  font-size: 1.125rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s, border-color 0.15s, background-color 0.3s ease;
+  z-index: 100;
+}
+
+.theme-toggle:hover {
+  color: var(--text-primary);
+  border-color: var(--accent);
+}
+
 /* Shortcuts trigger button */
 .shortcuts-trigger {
   position: fixed;
@@ -327,28 +391,28 @@ ul {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  border: 1px solid #333;
-  background: #16213e;
-  color: #888;
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  color: var(--text-muted);
   font-size: 1rem;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: color 0.15s, border-color 0.15s;
+  transition: color 0.15s, border-color 0.15s, background-color 0.3s ease;
   z-index: 100;
 }
 
 .shortcuts-trigger:hover {
-  color: #e0e0e0;
-  border-color: #0f3460;
+  color: var(--text-primary);
+  border-color: var(--accent);
 }
 
 /* Shortcuts overlay */
 .shortcuts-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: var(--overlay-bg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -360,8 +424,8 @@ ul {
 }
 
 .shortcuts-content {
-  background: #16213e;
-  border: 1px solid #333;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 2rem;
   max-width: 360px;
@@ -371,7 +435,7 @@ ul {
 .shortcuts-content h2 {
   font-size: 1.125rem;
   font-weight: 600;
-  color: #fff;
+  color: var(--text-heading);
   margin-bottom: 1rem;
 }
 
@@ -388,30 +452,30 @@ ul {
 }
 
 .shortcuts-list dt {
-  background: #1a1a2e;
-  border: 1px solid #333;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
   border-radius: 4px;
   padding: 0.2rem 0.5rem;
   font-size: 0.8rem;
-  color: #e0e0e0;
+  color: var(--text-primary);
   font-family: monospace;
 }
 
 .shortcuts-list dd {
-  color: #888;
+  color: var(--text-muted);
   font-size: 0.875rem;
 }
 
 .shortcuts-dismiss {
   margin-top: 1rem;
   text-align: center;
-  color: #555;
+  color: var(--text-subtle);
   font-size: 0.75rem;
 }
 
 .shortcuts-dismiss kbd {
-  background: #1a1a2e;
-  border: 1px solid #333;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
   border-radius: 3px;
   padding: 0.1rem 0.35rem;
   font-size: 0.7rem;

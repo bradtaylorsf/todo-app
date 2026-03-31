@@ -1,6 +1,45 @@
 import { createTodo, toggleTodo, removeTodo, editTodo, reorderTodos, filterTodos, countActive, countCompleted, isOverdue, isDueToday, sortByPriority, toggleAllTodos } from './todo.js';
 import { loadTodos, saveTodos } from './storage.js';
 
+// Theme initialization
+const THEME_KEY = 'todo-app-theme';
+
+function getInitialTheme() {
+  const saved = localStorage.getItem(THEME_KEY);
+  if (saved === 'light' || saved === 'dark') return saved;
+  return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+}
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+}
+
+function updateToggleIcon() {
+  const btn = document.querySelector('[data-testid="theme-toggle"]');
+  if (!btn) return;
+  const theme = document.documentElement.getAttribute('data-theme');
+  btn.textContent = theme === 'dark' ? '\u2600\uFE0F' : '\uD83C\uDF19';
+  btn.setAttribute('aria-label', `Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`);
+}
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  applyTheme(next);
+  localStorage.setItem(THEME_KEY, next);
+  updateToggleIcon();
+}
+
+applyTheme(getInitialTheme());
+
+// Theme toggle button
+const themeToggle = document.createElement('button');
+themeToggle.className = 'theme-toggle';
+themeToggle.setAttribute('data-testid', 'theme-toggle');
+themeToggle.addEventListener('click', toggleTheme);
+document.body.appendChild(themeToggle);
+updateToggleIcon();
+
 let todos = loadTodos();
 let currentFilter = 'all';
 let editingId = null;
