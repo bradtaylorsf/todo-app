@@ -8,6 +8,6 @@ export default defineConfig({
   webServer: {
     command: 'npx vite preview --port 4173',
     port: 4173,
-    reuseExistingServer: false,
+    reuseExistingServer: !process.env.CI,
   },
 });
