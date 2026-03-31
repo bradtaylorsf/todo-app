@@ -11,6 +11,8 @@ import {
   isOverdue,
   isDueToday,
   sortByDueDate,
+  setPriority,
+  sortByPriority,
 } from '../../src/todo.js';
 
 function makeTodo(overrides = {}) {
@@ -283,13 +285,93 @@ describe('countCompleted', () => {
 
 describe('createTodo with dueDate', () => {
   it('creates todo with dueDate when provided', () => {
-    const todo = createTodo('Test', '2026-04-15');
+    const todo = createTodo('Test', { dueDate: '2026-04-15' });
     expect(todo.dueDate).toBe('2026-04-15');
   });
 
   it('creates todo with null dueDate by default', () => {
     const todo = createTodo('Test');
     expect(todo.dueDate).toBeNull();
+  });
+});
+
+describe('createTodo with priority', () => {
+  it('defaults to medium priority', () => {
+    const todo = createTodo('Test');
+    expect(todo.priority).toBe('medium');
+  });
+
+  it('sets priority from options', () => {
+    const todo = createTodo('Test', { priority: 'high' });
+    expect(todo.priority).toBe('high');
+  });
+
+  it('sets both dueDate and priority', () => {
+    const todo = createTodo('Test', { dueDate: '2026-04-15', priority: 'low' });
+    expect(todo.dueDate).toBe('2026-04-15');
+    expect(todo.priority).toBe('low');
+  });
+});
+
+describe('setPriority', () => {
+  it('changes priority for matching ID', () => {
+    const todos = [makeTodo({ priority: 'medium' })];
+    const result = setPriority(todos, 'test-1', 'high');
+    expect(result[0].priority).toBe('high');
+  });
+
+  it('does not mutate the original array', () => {
+    const todos = Object.freeze([Object.freeze(makeTodo({ priority: 'medium' }))]);
+    const result = setPriority(todos, 'test-1', 'low');
+    expect(result).not.toBe(todos);
+    expect(result[0].priority).toBe('low');
+  });
+
+  it('leaves other todos unchanged', () => {
+    const todos = [makeTodo(), makeTodo({ id: 'test-2' })];
+    const result = setPriority(todos, 'test-1', 'high');
+    expect(result[1]).toBe(todos[1]);
+  });
+});
+
+describe('sortByPriority', () => {
+  it('sorts high first, then medium, then low', () => {
+    const todos = [
+      makeTodo({ id: '1', priority: 'low' }),
+      makeTodo({ id: '2', priority: 'high' }),
+      makeTodo({ id: '3', priority: 'medium' }),
+    ];
+    const result = sortByPriority(todos);
+    expect(result.map(t => t.id)).toEqual(['2', '3', '1']);
+  });
+
+  it('handles missing priority as medium', () => {
+    const todos = [
+      makeTodo({ id: '1', priority: 'low' }),
+      makeTodo({ id: '2' }), // no priority field
+    ];
+    delete todos[1].priority;
+    const result = sortByPriority(todos);
+    expect(result.map(t => t.id)).toEqual(['2', '1']);
+  });
+
+  it('does not mutate input', () => {
+    const todos = Object.freeze([
+      makeTodo({ id: '1', priority: 'low' }),
+      makeTodo({ id: '2', priority: 'high' }),
+    ]);
+    const result = sortByPriority(todos);
+    expect(result).not.toBe(todos);
+    expect(todos[0].id).toBe('1');
+  });
+
+  it('preserves order for same priority', () => {
+    const todos = [
+      makeTodo({ id: '1', priority: 'medium' }),
+      makeTodo({ id: '2', priority: 'medium' }),
+    ];
+    const result = sortByPriority(todos);
+    expect(result.map(t => t.id)).toEqual(['1', '2']);
   });
 });
 

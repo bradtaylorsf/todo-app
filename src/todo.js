@@ -1,15 +1,30 @@
-export function createTodo(text, dueDate = null) {
+export function createTodo(text, options = {}) {
   const trimmed = text.trim();
   if (!trimmed) {
     throw new Error('Todo text cannot be empty');
   }
+  const { dueDate = null, priority = 'medium' } = options;
   return {
     id: Date.now().toString(36) + Math.random().toString(36).slice(2),
     text: trimmed,
     completed: false,
     createdAt: Date.now(),
     dueDate: dueDate || null,
+    priority,
   };
+}
+
+export function setPriority(todos, id, priority) {
+  return todos.map(todo =>
+    todo.id === id ? { ...todo, priority } : todo
+  );
+}
+
+export function sortByPriority(todos) {
+  const weight = { high: 0, medium: 1, low: 2 };
+  return [...todos].sort((a, b) =>
+    (weight[a.priority] ?? 1) - (weight[b.priority] ?? 1)
+  );
 }
 
 export function isOverdue(todo) {
